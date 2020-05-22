@@ -43,11 +43,11 @@ def separate_by_class(dataset):
     return separated_data
 
 def mean(feature):
-    return sum(feature)/float(len(feature))
+    return (sum(feature)/float(len(feature)))
 
 def stdv(feature, mean):
     variance = sum([(x - mean)**2 for x in feature])/float(len(feature)-1)
-    return sqrt(variance)
+    return (sqrt(variance))
 
 def occurence(feature):
     condition = dict()
@@ -55,8 +55,8 @@ def occurence(feature):
         condition[cell] += 1
     return condition
 
-def distribution_check(feature):
-    if type(feature[0]) == int or float:
+def distribution_check(value):
+    if type(value) == int or float:
         return 'continuous'
     else:
         return 'discrete'
@@ -68,11 +68,13 @@ def statistic_measure(dataset):
         if distribution_type == 'continuous':
             avg = mean(column)
             dev = stdv(column, mean)
-            summarize = [avg, dev, len(column)]
+            summarize = [len(column), avg, dev]
             statistic.append(summarize)
         elif distribution_type == 'discrete':
-            summarize = [occurence(column), len(column)]
+            summarize = [len(column), occurence(column)]
             statistic.append(summarize)
+        else:
+            statistic.append(None)
     return statistic
 
 def statistic_by_class(dataset):
@@ -81,7 +83,32 @@ def statistic_by_class(dataset):
     for class_label, row in separated.items():
         statistic[class_label] = statistic_measure(row)
     return statistic
-    
+
+def discrete_probability(value, occurence, count):
+    counted_value = occurence[value]
+    return (counted_value / count)
+
+def continuous_probability(value, mean, stdv):
+    exponent = exp(-((value - mean)**2 / 2 * stdv**2))
+    return (1 / sqrt((2 * pi) * stdv) * exponent)
+
+def class_probability(statistic, row, total):
+    probabilities = dict()
+    for class_value, class_statistic in statistic.items():
+        probabilities[class_value] = class_statistic[0][0] / total
+        for i in range(len(class_statistic)):
+            value = row(i)
+            value_type = distribution_check(value)
+            if value_type == 'continuous':
+                _, mean, stdv = class_statistic(i)
+                probabilities[class_value] *= continuous_probability(value, mean, stdv)
+            elif value_type == 'discrete':
+                count, occurence = class_statistic(i)
+                probabilities[class_value] *= discrete_probability(value, occurence, count)
+    return probabilities
+
+
+            
             
             
         
