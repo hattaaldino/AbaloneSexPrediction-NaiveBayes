@@ -145,14 +145,31 @@ for x in attribute[1:]:
     val = input(f'{attr} : ')
     try:
         value = float(val)
-        new_row.append(value)
-    except (ValueError, TypeError):
+    except TypeError:
         new_row.append(0)
+    except ValueError:
+        while True:
+            print('The input must be float/decimal!')
+            fix_val = input(f'{attr} : ')
+            try:
+                fix_value = float(fix_val)
+            except TypeError:
+                new_row.append(0)
+                break
+            except ValueError:
+                continue
+            else:
+                new_row.append(fix_value)
+                break
+    else:
+        new_row.append(value)
 
 probabilities = class_probability(statistic, new_row, count)
 potent_class = classifier(probabilities)
 print('\n-----Result-----\n')
 print(f'Abalone Sex : {potent_class}')
+
+input('\nPress enter to exit...')
 
      
             
