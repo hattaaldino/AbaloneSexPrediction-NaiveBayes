@@ -41,8 +41,8 @@ def separate_by_class(dataset):
         separated_data[label].append(value)
     return separated_data
 
-#Convert all feature values into float
-def convert(dataset):
+# Convert all continous feature values into float
+def continuous_convert(dataset):
     convert_data = list()
     for data in dataset:
         convert_data.append(float(data))
@@ -77,7 +77,7 @@ def statistic_measure(dataset):
     for column in zip(*dataset):
         distribution_type = distribution_check(column)
         if distribution_type == 'continuous':
-            convert_column = convert(column)
+            convert_column = continuous_convert(column)
             avg = mean(convert_column)
             dev = stdv(convert_column, avg)
             summarize = [len(column), avg, dev]
@@ -133,10 +133,12 @@ def classifier(probabilities):
     predict = best_class
     return predict
 
+# Get the statistic from "abalone_original.csv"
 file = "abalone_original.csv"
 attribute, dataset, count = load_data(file)
 statistic = statistic_by_class(dataset)
 
+# Predict the class of new data
 new_row = list()
 print("------------ Abalone Sex Classification ------------\n")
 print("Masukan Nilai Atribut")
